@@ -17,13 +17,20 @@ theme_set(
 ```
 
 ```{r}
-bhl <- read_xlsx("data/DataSet.xlsx", sheet = "data") %>% 
-  mutate(across(tet33:ermb, ~replace(., . == "<LOD" | . == "<LOQ", 0))) 
+bhl <- read_xlsx("data/DataSet2.xlsx", sheet = "data") %>% 
+  mutate(across(tet33:ermb, ~replace(., . == "<LOD" | . == "<LOQ", 0))) %>% 
+  rowwise() %>% 
+  mutate(
+    count = sum(c_across(tet33:ermb) > 0),
+    class = case_when(
+      count <= 1 ~ "low",
+      count == 2 ~ "medium",
+      is.na(count) ~ "unknown",
+      TRUE ~ "high"
+    )
+  ) 
   
-```
-
-```{r}
-bhl
+bhl 
 ```
 
 # Clean and explore the data
@@ -38,6 +45,8 @@ bhl
   * Could revisit if something doesn't work out
 * Figure out class distributions
   * We can even out classes using oversampling (SMOTE algorithm)
+* Do unsupervised learning
+  * PCA/NMDS/clustering/ordination stuff
   
 # Do feature selection
 
